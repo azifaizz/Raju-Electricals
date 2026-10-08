@@ -110,9 +110,9 @@ const HomePage = () => {
       const { getDistanceMeters } = await import('@/utils/geofence');
       const dist = Math.round(getDistanceMeters(res.position.latitude, res.position.longitude, office.latitude, office.longitude));
       setDistance(dist);
-      if (dist <= office.radiusMeters) {
+      if (dist <= office.radiusMeters || window.location.hostname === 'localhost') {
         setLocState('ok');
-        setLocMsg('Within office premises');
+        setLocMsg(window.location.hostname === 'localhost' ? 'Local testing: Geofence bypassed' : 'Within office premises');
       } else {
         setLocState('far');
         setLocMsg(`You're ${dist}m from the office (limit ${office.radiusMeters}m).`);

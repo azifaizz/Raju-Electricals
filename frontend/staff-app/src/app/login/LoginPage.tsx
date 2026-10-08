@@ -20,7 +20,7 @@ const LoginPage = () => {
     try {
       await login(username.trim(), password);
     } catch (err: any) {
-      setError(err?.response?.data?.message || 'Invalid credentials. Please try again.');
+      setError(`DEBUG ERROR: ${err.message || 'unknown'} - Name: ${err.name || 'unknown'}. Code: ${err.code || 'unknown'}`);
     } finally {
       setLoading(false);
     }
@@ -89,7 +89,13 @@ const LoginPage = () => {
           </button>
         </form>
 
-        <p className="t-tiny" style={{ textAlign: 'center', marginTop: 28 }}>
+        <div style={{ marginTop: 24, textAlign: 'center' }}>
+          <p className="t-muted" style={{ fontSize: 13 }}>
+            Note: If you have forgotten your password, please contact your administrator to reset it.
+          </p>
+        </div>
+
+        <p className="t-tiny" style={{ textAlign: 'center', marginTop: 16 }}>
           Version 1.0
         </p>
       </div>

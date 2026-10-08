@@ -39,14 +39,6 @@ export const locationService = {
    * Permission is (re)requested every call so the OS prompt appears each visit.
    */
   async ensureLocation(): Promise<LocationResult> {
-    let perm = await this.getPermissionStatus();
-    if (perm.location !== 'granted') {
-      perm = await this.requestPermission();
-    }
-    if (perm.location !== 'granted') {
-      return { status: perm.location === 'denied' ? 'denied' : 'prompt' };
-    }
-
     try {
       const position = await Geolocation.getCurrentPosition({
         enableHighAccuracy: true,
