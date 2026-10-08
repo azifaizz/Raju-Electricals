@@ -1,0 +1,60 @@
+gcloud config set project rajuelec-2028b
+gcloud services enable run.googleapis.com artifactregistry.googleapis.com secretmanager.googleapis.com
+# ==========================================
+# 1. Product Service
+# ==========================================
+
+docker build -t product-service:demo ./product-service
+docker tag product-service:demo asia-southeast1-docker.pkg.dev/rajuelec-2028b/rajuelec-repo/product-service:demo
+docker push asia-southeast1-docker.pkg.dev/rajuelec-2028b/rajuelec-repo/product-service:demo
+gcloud run deploy product-service-demo `
+  --image asia-southeast1-docker.pkg.dev/rajuelec-2028b/rajuelec-repo/product-service:demo `
+  --region asia-southeast1 `
+  --platform managed `
+  --port 8081 `
+  --memory 1Gi `
+  --timeout 300 `
+  --allow-unauthenticated
+
+# ==========================================
+# 2. Vendor Service
+# ==========================================
+docker build -t vendor-service:demo ./vendor-service
+docker tag vendor-service:demo asia-southeast1-docker.pkg.dev/rajuelec-2028b/rajuelec-repo/vendor-service:demo
+docker push asia-southeast1-docker.pkg.dev/rajuelec-2028b/rajuelec-repo/vendor-service:demo
+gcloud run deploy vendor-service-demo `
+  --image asia-southeast1-docker.pkg.dev/rajuelec-2028b/rajuelec-repo/vendor-service:demo `
+  --region asia-southeast1 `
+  --platform managed `
+  --port 8082 `
+  --memory 1Gi `
+  --timeout 300 `
+  --allow-unauthenticated
+# ==========================================
+# 3. Staff Service
+# ==========================================
+docker build -t staff-service:demo ./staff-service; docker tag staff-service:demo asia-southeast1-docker.pkg.dev/rajuelec-2028b/rajuelec-repo/staff-service:demo; docker push asia-southeast1-docker.pkg.dev/rajuelec-2028b/rajuelec-repo/staff-service:demo; gcloud run deploy staff-service-demo --image asia-southeast1-docker.pkg.dev/rajuelec-2028b/rajuelec-repo/staff-service:demo --region asia-southeast1 --platform managed --port 8084 --memory 1Gi --timeout 300 --allow-unauthenticated
+
+# ==========================================
+# 4. Billing Service
+# ==========================================
+# IMPORTANT: Update billing-service/src/main/resources/application.properties
+# with the URL from the Product Service deployment above.
+docker build -t billing-service:demo ./billing-service; docker tag billing-service:demo asia-southeast1-docker.pkg.dev/rajuelec-2028b/rajuelec-repo/billing-service:demo; docker push asia-southeast1-docker.pkg.dev/rajuelec-2028b/rajuelec-repo/billing-service:demo; gcloud run deploy billing-service-demo `
+  --image asia-southeast1-docker.pkg.dev/rajuelec-2028b/rajuelec-repo/billing-service:demo `
+  --region asia-southeast1 `
+  --platform managed `
+  --port 8083 `
+  --memory 1Gi `
+  --timeout 300 `
+  --allow-unauthenticated
+# ==========================================
+# 5. Gateway Service
+# ==========================================
+# Replace the PASTE_..._URL placeholders with the actual URLs generated from the steps above.
+
+docker build -t gateway-demo4:latest ./Gate-way
+docker tag gateway-demo4:latest asia-southeast1-docker.pkg.dev/demo4-538da/demo4-repo/gateway-demo4:latest
+docker push asia-southeast1-docker.pkg.dev/demo4-538da/demo4-repo/gateway-demo4:latest
+gcloud run deploy gateway-demo4 --image asia-southeast1-docker.pkg.dev/demo4-538da/demo4-repo/gateway-demo4:latest --region asia-southeast1 --platform managed --memory 1Gi --timeout 300 --port 8080 --allow-unauthenticated \
+--set-env-vars="PRODUCT_SERVICE_URL=PASTE_PRODUCT_SERVICE_URL,BILLING_SERVICE_URL=PASTE_BILLING_SERVICE_URL,VENDOR_SERVICE_URL=PASTE_VENDOR_SERVICE_URL,STAFF_SERVICE_URL=PASTE_STAFF_SERVICE_URL"
